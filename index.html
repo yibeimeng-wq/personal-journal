@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Journal</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Login Screen -->
+    <div id="login-screen" class="screen">
+      <div class="login-container">
+        <h1>📓 Personal Journal</h1>
+        <p class="subtitle">Your private space for thoughts</p>
+        
+        <div id="login-form" class="auth-form">
+          <input type="text" id="login-username" placeholder="Username" autocomplete="username">
+          <input type="password" id="login-password" placeholder="Password" autocomplete="current-password">
+          <button onclick="login()" class="btn-primary">Login</button>
+          <p class="auth-switch">New here? <a href="#" onclick="showRegister()">Create account</a></p>
+        </div>
+        
+        <div id="register-form" class="auth-form" style="display: none;">
+          <input type="text" id="reg-username" placeholder="Choose username" autocomplete="username">
+          <input type="password" id="reg-password" placeholder="Choose password" autocomplete="new-password">
+          <input type="password" id="reg-password-confirm" placeholder="Confirm password" autocomplete="new-password">
+          <button onclick="register()" class="btn-primary">Create Account</button>
+          <p class="auth-switch">Already have an account? <a href="#" onclick="showLoginScreen()">Login</a></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Journal Screen -->
+    <div id="main-screen" class="screen" style="display: none;">
+      <header class="header">
+        <h1>📓 Personal Journal</h1>
+        <div class="header-actions">
+          <span id="welcome-user"></span>
+          <button onclick="toggleJournalList()" class="btn-secondary mobile-only" style="display:none;">📚</button>
+          <button onclick="logout()" class="btn-secondary">Logout</button>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <!-- Journal List -->
+        <aside id="journal-panel" class="journal-list-panel">
+          <div class="panel-header">
+            <h2>My Journals</h2>
+            <button onclick="showEditor()" class="btn-primary">+ New</button>
+          </div>
+          <div id="journal-list" class="journal-list">
+            <!-- Journals will be loaded here -->
+          </div>
+        </aside>
+
+        <!-- Journal Detail/Editor -->
+        <section class="journal-content-panel">
+          <!-- Empty State -->
+          <div id="empty-state" class="empty-state">
+            <p>Select a journal to read or create a new one</p>
+          </div>
+
+          <!-- View Mode -->
+          <div id="journal-view" class="journal-view" style="display: none;">
+            <div class="journal-header">
+              <h2 id="view-title"></h2>
+              <div class="journal-meta">
+                <span id="view-date"></span>
+              </div>
+              <div class="journal-actions" id="owner-actions" style="display: none;">
+                <button onclick="editJournal()" class="btn-secondary">Edit</button>
+                <button onclick="deleteJournal()" class="btn-danger">Delete</button>
+              </div>
+            </div>
+            <div id="view-content" class="journal-text"></div>
+          </div>
+
+          <!-- Edit Mode -->
+          <div id="journal-editor" class="journal-editor" style="display: none;">
+            <div class="editor-header">
+              <input type="text" id="edit-title" placeholder="Title (optional)" class="title-input">
+            </div>
+            <textarea id="edit-content" class="content-input" placeholder="Write your thoughts here (English typos will be auto-detected)..."></textarea>
+            
+            <!-- Grammar Suggestions for English -->
+            <div id="grammar-suggestions" class="grammar-panel" style="display: none;">
+              <h4>✏️ Writing Suggestions</h4>
+              <div id="grammar-list"></div>
+            </div>
+            
+            <div class="editor-actions">
+              <button onclick="cancelEdit()" class="btn-secondary">Cancel</button>
+              <button onclick="saveJournal()" class="btn-primary">Save</button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- Stats Panel -->
+      <div id="stats-panel" class="stats-panel" style="display: none;">
+        <div class="stats-content">
+          <h3>📊 Weekly Stats</h3>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-number" id="stat-created">0</span>
+              <span class="stat-label">Created</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" id="stat-updated">0</span>
+              <span class="stat-label">Updated</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" id="stat-deleted">0</span>
+              <span class="stat-label">Deleted</span>
+            </div>
+          </div>
+          <button onclick="toggleStats()" class="btn-close-stats">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Public Read Mode -->
+    <div id="public-screen" class="screen" style="display: none;">
+      <header class="header">
+        <h1>📓 Personal Journal</h1>
+        <button onclick="showLoginScreen()" class="btn-secondary">My Journal</button>
+      </header>
+
+      <main class="main-content public-mode">
+        <aside class="journal-list-panel">
+          <div class="panel-header">
+            <h2>All Journals</h2>
+          </div>
+          <div id="public-journal-list" class="journal-list">
+            <!-- Public journals will be loaded here -->
+          </div>
+        </aside>
+
+        <section class="journal-content-panel">
+          <div id="public-empty-state" class="empty-state">
+            <p>No journals yet. Login to start writing!</p>
+          </div>
+          <div id="public-journal-view" class="journal-view" style="display: none;">
+            <div class="journal-header">
+              <h2 id="public-view-title"></h2>
+              <div class="journal-meta">
+                <span id="public-view-date"></span>
+              </div>
+            </div>
+            <div id="public-view-content" class="journal-text"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
