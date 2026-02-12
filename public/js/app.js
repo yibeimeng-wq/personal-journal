@@ -33,17 +33,16 @@ function checkAuth() {
 function showLogin() {
   loginScreen.style.display = 'flex';
   publicScreen.style.display = 'none';
-  showRegister();
+  document.getElementById('login-form').style.display = 'block';
+  document.getElementById('register-form').style.display = 'none';
 }
 
 function showRegister() {
+  loginScreen.style.display = 'flex';
+  publicScreen.style.display = 'none';
   document.getElementById('login-form').style.display = 'none';
   document.getElementById('register-form').style.display = 'block';
 }
-
-async function login() {
-  const username = document.getElementById('login-username').value;
-  const password = document.getElementById('login-password').value;
 
   if (!username || !password) {
     showToast('Please enter username and password', 'error');
