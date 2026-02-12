@@ -142,7 +142,7 @@ const authenticateToken = (req, res, next) => {
     return res.status(401).json({ error: 'Authentication required' });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key', (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) return res.status(403).json({ error: 'Invalid token' });
     req.user = user;
     next();
@@ -183,7 +183,7 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
 
     const token = jwt.sign(
       { id: user.id, username: user.username },
-      process.env.JWT_SECRET || 'your-secret-key',
+      process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
@@ -215,7 +215,7 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
 
     const token = jwt.sign(
       { id: result.lastInsertRowid, username },
-      process.env.JWT_SECRET || 'your-secret-key',
+      process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
@@ -273,7 +273,7 @@ app.post('/api/journals', limiter, authenticateToken, (req, res) => {
     return res.status(400).json({ error: 'Content is required' });
   }
 
-   try {
+  try {
     run(
       'INSERT INTO journals (title, content, language) VALUES (?, ?, ?)',
       [title || '', content, language || 'mixed']
@@ -292,6 +292,9 @@ app.post('/api/journals', limiter, authenticateToken, (req, res) => {
     }
 
     res.json({ id: newJournal?.id, message: 'Journal created' });
+  } catch (error) {
+    console.error('Create journal error:', error);
+    res.status(500).json({ error: 'Failed to create journal' });
   }
 });
 
