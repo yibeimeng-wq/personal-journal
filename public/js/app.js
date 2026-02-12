@@ -44,6 +44,10 @@ function showRegister() {
   document.getElementById('register-form').style.display = 'block';
 }
 
+async function login() {
+  const username = document.getElementById('login-username').value;
+  const password = document.getElementById('login-password').value;
+
   if (!username || !password) {
     showToast('Please enter username and password', 'error');
     return;
