@@ -273,11 +273,14 @@ app.post('/api/journals', limiter, authenticateToken, (req, res) => {
     return res.status(400).json({ error: 'Content is required' });
   }
 
-  try {
-    const result = run(
+   try {
+    run(
       'INSERT INTO journals (title, content, language) VALUES (?, ?, ?)',
       [title || '', content, language || 'mixed']
     );
+
+    // Get the actual last inserted ID
+    const newJournal = getOne('SELECT id FROM journals ORDER BY id DESC LIMIT 1');
 
     // Update stats
     const today = new Date().toISOString().split('T')[0];
@@ -288,10 +291,7 @@ app.post('/api/journals', limiter, authenticateToken, (req, res) => {
       run('INSERT INTO journal_stats (date, created_count) VALUES (?, 1)', [today]);
     }
 
-    res.json({ id: result.lastInsertRowid, message: 'Journal created' });
-  } catch (error) {
-    console.error('Create journal error:', error);
-    res.status(500).json({ error: 'Failed to create journal' });
+    res.json({ id: newJournal?.id, message: 'Journal created' });
   }
 });
 
