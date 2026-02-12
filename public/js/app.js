@@ -230,13 +230,15 @@ async function viewJournal(id) {
   }
 }
 
+// ✅ BUG FIX #1: 修复公开访问模式无法查看日记
 async function viewPublicJournal(id) {
   try {
     const response = await fetch(`${API_URL}/journals/${id}`);
     const journal = await response.json();
     
     currentJournal = journal;
-    showJournalView(journal, false);
+    // 使用公开访问专用的显示函数
+    showPublicJournalView(journal);
     loadPublicJournals(); // Refresh active state
   } catch (error) {
     showToast('Failed to load journal', 'error');
@@ -253,6 +255,19 @@ function showJournalView(journal, isOwner) {
   document.getElementById('view-content').textContent = journal.content;
   
   document.getElementById('owner-actions').style.display = isOwner ? 'flex' : 'none';
+}
+
+// ✅ BUG FIX #1: 新增公开访问专用的显示函数
+function showPublicJournalView(journal) {
+  // 隐藏空状态
+  document.getElementById('public-empty-state').style.display = 'none';
+  // 显示公开访问视图
+  document.getElementById('public-journal-view').style.display = 'block';
+  
+  // 使用公开访问专用的 DOM 元素
+  document.getElementById('public-view-title').textContent = journal.title || 'Untitled';
+  document.getElementById('public-view-date').textContent = formatDate(journal.created_at);
+  document.getElementById('public-view-content').textContent = journal.content;
 }
 
 function showEditor(journal = null) {
@@ -281,15 +296,22 @@ function editJournal() {
   showEditor(currentJournal);
 }
 
+// ✅ BUG FIX #2: 修复取消编辑后内容消失
 function cancelEdit() {
   isEditing = false;
-  currentJournal = null;
+  
+  // 如果之前有打开的日记,恢复到查看模式
+  if (currentJournal) {
+    showJournalView(currentJournal, true);
+  } else {
+    // 如果没有,显示空状态
+    currentJournal = null;
+    document.getElementById('empty-state').style.display = 'flex';
+    document.getElementById('journal-view').style.display = 'none';
+    document.getElementById('journal-editor').style.display = 'none';
+  }
   
   loadJournals();
-  
-  document.getElementById('empty-state').style.display = 'flex';
-  document.getElementById('journal-view').style.display = 'none';
-  document.getElementById('journal-editor').style.display = 'none';
 }
 
 async function saveJournal() {
@@ -546,15 +568,18 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+// ✅ BUG FIX #3: 修复时区显示错误
 function formatDate(dateString) {
   if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('zh-CN', {
+  // 添加 'Z' 标记为 UTC 时间,然后转换为本地时区
+  const date = new Date(dateString + 'Z');
+  return date.toLocaleString('zh-CN', {
     year: 'numeric',
-    month: 'short',
+    month: 'long',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
+    timeZone: 'Asia/Shanghai'
   });
 }
 
