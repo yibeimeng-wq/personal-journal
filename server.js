@@ -9,6 +9,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 const DB_PATH = process.env.DB_PATH || './data/journal.db';
 
